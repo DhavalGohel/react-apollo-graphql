@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { withRouter } from "react-router";
 import { Link } from "react-router-dom";
 import ErrorMessage from "./Error";
-import { GET_REPOSITORIES_OF_CURRENT_USER } from "../Services/ApolloQueries";
-import { Query } from "react-apollo";
+import { GET_REPOSITORIES, ADD_STAR } from "../Services/ApolloQueries";
+import { Query, Mutation } from "react-apollo";
 
 const Header = () => {
   const [search, setSearch] = useState("");
@@ -14,7 +14,7 @@ const Header = () => {
 
   return (
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <Link class="navbar-brand" href="/">
+      <Link class="navbar-brand" to="/">
         Github
       </Link>
       <button
@@ -43,66 +43,85 @@ const Header = () => {
             type="search"
             placeholder="Search"
             value={search}
-            onchange={e => handleChange(e)}
+            onChange={e => handleChange(e)}
             aria-label="Search"
           />
-          <button class="btn btn-outline-success my-2 my-sm-0" type="button">
-            Search
-          </button>
         </form>
       </div>
-      <div
-        style={{
-          position: "absolute",
-          top: "100px",
-          right: 0,
-          maxWidth: "300px",
-          zIndex: "9999"
-        }}
-      >
+      {search && search.length > 0 && (
         <Query
-          query={GET_REPOSITORIES_OF_CURRENT_USER}
+          query={GET_REPOSITORIES}
+          variables={{ query: search }}
           notifyOnNetworkStatusChange={true}
         >
-          {({ data, loading, error, fetchMore }) => {
+          {({ data, loading, error }) => {
             if (!data && loading) {
               return <span> Loading....</span>;
             }
             if (error) {
               return <ErrorMessage error={error}></ErrorMessage>;
             }
+
             const {
-              search: { edges }
+              search: { nodes }
             } = data;
-            if (edges && edges.length > 0) {
-              return edges.map((edge, key) => {
-                return (
-                  <div className="media mb-3">
-                    <img
-                      alt="img"
-                      className="mr-3"
-                      src={edge.node.owner.avatarUrl}
-                      style={{ width: "64px", height: "64px" }}
-                    />
-                    <div className="media-body">
-                      <h5 className="mt-0">{edge.node.nameWithOwner}</h5>
-                      <p>Created at : {edge.node.createdAt}</p>
-                      <button
-                        className="btn btn-primary"
-                        onClick={e => console.log(e)}
-                      >
-                        Star
-                      </button>
-                    </div>
-                  </div>
-                );
-              });
-            } else {
-              return <>No Data found</>;
+
+            if (!data || !nodes || nodes.length <= 0) {
+              return <></>;
             }
+
+            return (
+              <div
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  width: "100%",
+                  maxWidth: "400px",
+                  zIndex: "9999",
+                  height: "100%",
+                  minHeight: "300px",
+                  maxHeight: "500px",
+                  border: "1px solid grey",
+                  padding: "10px",
+                  top: "50px",
+                  overflowY: "scroll"
+                }}
+              >
+                {nodes.map((node, key) => {
+                  return (
+                    <div className="media mb-3" key={key}>
+                      <img
+                        alt="img"
+                        className="mr-3"
+                        src={node.owner.avatarUrl}
+                        style={{ width: "64px", height: "64px" }}
+                      />
+                      <div className="media-body">
+                        <h5 className="mt-0">{node.nameWithOwner}</h5>
+                        <p>Created at : {node.createdAt}</p>
+                        <Mutation
+                          mutation={ADD_STAR}
+                          variables={{ id: node.id }}
+                          children={(addStar, { data }) => (
+                            <button
+                              className="btn btn-primary"
+                              onClick={e =>
+                                addStar({ variables: { id: node.id } })
+                              }
+                            >
+                              Star
+                            </button>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
           }}
         </Query>
-      </div>
+      )}
     </nav>
   );
 };

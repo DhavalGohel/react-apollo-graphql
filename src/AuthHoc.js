@@ -2,7 +2,7 @@ import React from "react";
 
 export default function(ComposedComponent) {
   class AuthHoc extends React.Component {
-    componentWillMount() {
+    componentDidMount() {
       if (!sessionStorage.getItem("token")) {
         this.props.history.push("/login");
       }

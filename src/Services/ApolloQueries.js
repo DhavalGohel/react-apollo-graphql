@@ -1,20 +1,20 @@
 import gql from "graphql-tag";
 
 export const GET_REPOSITORIES = gql`
-  query {
-    search(query: "is:public", type: REPOSITORY, first: 80) {
-      edges {
-        node {
-          ... on Repository {
-            id
-            name
-            owner {
-              id
-              avatarUrl(size: 64)
-              login
-            }
-            nameWithOwner
-            createdAt
+  query topRepos($query: String!) {
+    search(first: 10, query: $query, type: REPOSITORY) {
+      repositoryCount
+      nodes {
+        ... on Repository {
+          name
+          id
+          nameWithOwner
+          createdAt
+          owner {
+            avatarUrl
+          }
+          stargazers {
+            totalCount
           }
         }
       }
@@ -24,21 +24,41 @@ export const GET_REPOSITORIES = gql`
 
 export const GET_STARRED_REPOSITORIES = gql`
   query {
-    search(query: "is:public", type: REPOSITORY, first: 80) {
-      edges {
-        node {
-          ... on Repository {
-            id
+    viewer {
+      login
+      name
+      starredRepositories(first: 20) {
+        edges {
+          node {
             name
-            owner {
-              id
-              avatarUrl(size: 64)
-              login
-            }
+            id
             nameWithOwner
             createdAt
+            owner {
+              avatarUrl
+            }
           }
         }
+      }
+    }
+  }
+`;
+
+export const REMOVE_STAR = gql`
+  mutation($id: String!) {
+    removeStar(input: { starrableId: $id }) {
+      starrable {
+        id
+      }
+    }
+  }
+`;
+
+export const ADD_STAR = gql`
+  mutation($id: String!) {
+    addStar(input: { starrableId: $id }) {
+      starrable {
+        id
       }
     }
   }

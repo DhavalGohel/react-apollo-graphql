@@ -11,7 +11,7 @@ export default class Login extends React.Component {
               <div className="card-body">
                 <a
                   className="btn btn-outline-primary"
-                  href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}&redirect_uri=${redirectUrl}`}
+                  href={`https://github.com/login/oauth/authorize?scope=user,user:email,public_repo,gist&client_id=${clientId}&redirect_uri=${redirectUrl}`}
                 >
                   {" "}
                   Login with Github
