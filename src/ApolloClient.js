@@ -5,11 +5,12 @@ import { onError } from "apollo-link-error";
 import { InMemoryCache } from "apollo-cache-inmemory";
 
 const GITHUB_BASE_URL = "https://api.github.com/graphql";
-
+const token = sessionStorage.getItem("token");
+console.log("TK", token);
 const httpLink = new HttpLink({
   uri: GITHUB_BASE_URL,
   headers: {
-    authorization: `Bearer `
+    authorization: token ? `Bearer ${token}` : ""
   }
 });
 

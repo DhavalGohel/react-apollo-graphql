@@ -5,21 +5,19 @@ export const getParamsFromUrl = key => {
 };
 export default class AuthService {
   login(code) {
-    const params = {
-      client_id: clientId,
-      client_secret: clientSecret,
-      code: code
-    };
-    console.log(params);
-    fetch("https://github.com/login/oauth/access_token", {
-      method: "POST",
-      headers: new Headers(),
-      body: JSON.stringify(params)
+    const params = new FormData();
+    params.append("client_id", clientId);
+    params.append("client_secret", clientSecret);
+    params.append("code", code);
+    return fetch(`https://github.com/login/oauth/access_token`, {
+      method: "post",
+      body: params,
+      headers: {
+        accept: "application/json"
+      }
     })
       .then(res => res.json())
-      .then(data => console.log(data))
-      .catch(e => {
-        console.error(e);
-      });
+      .then(data => data)
+      .catch(e => e);
   }
 }

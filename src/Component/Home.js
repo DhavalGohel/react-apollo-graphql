@@ -8,30 +8,49 @@ export default class Home extends React.Component {
     return (
       <div className="container">
         <div className="row">
-          <ul className="list-group">
-            <Query
-              query={GET_REPOSITORIES_OF_CURRENT_USER}
-              notifyOnNetworkStatusChange={true}
-            >
-              {({ data, loading, error, fetchMore }) => {
-                if (!data && loading) {
-                  return <span> Loading....</span>;
-                }
-                if (error) {
-                  return <ErrorMessage error={error}></ErrorMessage>;
-                }
-                const { viewer } = data;
-                console.log(viewer);
-                // viewer.map((data, key) => {
-                //   return (
-                //     <li className="list-item" key={key}>
-                //       Key1
-                //     </li>
-                //   );
-                // });
-              }}
-            </Query>
-          </ul>
+          <Query
+            query={GET_REPOSITORIES_OF_CURRENT_USER}
+            notifyOnNetworkStatusChange={true}
+          >
+            {({ data, loading, error, fetchMore }) => {
+              if (!data && loading) {
+                return <span> Loading....</span>;
+              }
+              if (error) {
+                return <ErrorMessage error={error}></ErrorMessage>;
+              }
+              const {
+                search: { edges }
+              } = data;
+              if (edges && edges.length > 0) {
+                return edges.map((edge, key) => {
+                  return (
+                    <div className="col-6">
+                      <div className="media mb-3">
+                        <img
+                          className="mr-3"
+                          src={edge.node.owner.avatarUrl}
+                          style={{ width: "64px", height: "64px" }}
+                        />
+                        <div className="media-body">
+                          <h5 className="mt-0">{edge.node.nameWithOwner}</h5>
+                          <p>Created at : {edge.node.createdAt}</p>
+                          <button
+                            className="btn btn-primary"
+                            onClick={e => console.log(e)}
+                          >
+                            Star
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                });
+              } else {
+                return <>No Data found</>;
+              }
+            }}
+          </Query>
         </div>
       </div>
     );
