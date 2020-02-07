@@ -1,3 +1,3 @@
-export const clientId = "f2478b5796b0f6849643";
-export const clientSecret = "fb194412a17747fbc6282c5b940c069e96baf02f";
-export const redirectUrl = "http://localhost:3001/login";
+export const clientId = ""; // Here you have to set client ID;
+export const clientSecret = ""; // Here you have to set client secret
+export const redirectUrl = ""; // here you can set redirect url Like "http://localhost:3001/login";
